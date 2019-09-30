@@ -15,9 +15,9 @@ public class ConfigureEndpointAzureServiceBusTransport : IConfigureEndpointTestE
         var connectionString = Environment.GetEnvironmentVariable("AzureServiceBus_ConnectionString");
         transport.ConnectionString(connectionString);
 
-        transport.SubscriptionNameShortener(name => Shorten(name));
+        transport.SubscriptionNameSanitizer(name => Shorten(name));
 
-        transport.RuleNameShortener(name => Shorten(name));
+        transport.RuleNameSanitizer(name => Shorten(name));
 
         configuration.RegisterComponents(c => c.ConfigureComponent<TestIndependenceMutator>(DependencyLifecycle.SingleInstance));
 

@@ -92,28 +92,29 @@
         }
 
         /// <summary>
-        /// Specifies a callback to apply to the subscription name when the endpoint's name is longer than 50 characters.
+        /// Specifies a callback to apply to the subscription to alter it's default name from endpoint name
         /// </summary>
         /// <param name="transportExtensions"></param>
-        /// <param name="subscriptionNameShortener">The callback to apply.</param>
+        /// <param name="subscriptionNameSanitizer">The callback to apply.</param>
         /// <returns></returns>
-        public static TransportExtensions<AzureServiceBusTransport> SubscriptionNameShortener(this TransportExtensions<AzureServiceBusTransport> transportExtensions, Func<string, string> subscriptionNameShortener)
+        public static TransportExtensions<AzureServiceBusTransport> SubscriptionNameSanitizer(this TransportExtensions<AzureServiceBusTransport> transportExtensions, Func<string, string> subscriptionNameSanitizer)
         {
-            Guard.AgainstNull(nameof(subscriptionNameShortener), subscriptionNameShortener);
+            Guard.AgainstNull(nameof(subscriptionNameSanitizer), subscriptionNameSanitizer);
 
-            Func<string, string> wrappedSubscriptionNameShortener = subsciptionName =>
+            string WrappedSubscriptionNameSanitizer(string subscriptionName)
             {
-                try
-                {
-                    return subscriptionNameShortener(subsciptionName);
-                }
-                catch (Exception exception)
-                {
-                    throw new Exception("Custom subscription name shortener threw an exception.", exception);
-                }
-            };
+	            try
+	            {
+		            return subscriptionNameSanitizer(subscriptionName);
+	            }
+	            catch (Exception exception)
+	            {
+		            throw new Exception("Custom subscription name sanitizer threw an exception.", exception);
+	            }
+            }
 
-            transportExtensions.GetSettings().Set(SettingsKeys.SubscriptionNameShortener, wrappedSubscriptionNameShortener);
+            transportExtensions.GetSettings().Set(SettingsKeys.SubscriptionNameSanitizer,
+	            (Func<string, string>)WrappedSubscriptionNameSanitizer);
 
             return transportExtensions;
         }
@@ -122,25 +123,25 @@
         /// Specifies a callback to apply to a subscription rule name when a subscribed event's name is longer than 50 characters.
         /// </summary>
         /// <param name="transportExtensions"></param>
-        /// <param name="ruleNameShortener">The callback to apply.</param>
+        /// <param name="ruleNameSanitizer">The callback to apply.</param>
         /// <returns></returns>
-        public static TransportExtensions<AzureServiceBusTransport> RuleNameShortener(this TransportExtensions<AzureServiceBusTransport> transportExtensions, Func<string, string> ruleNameShortener)
+        public static TransportExtensions<AzureServiceBusTransport> RuleNameSanitizer(this TransportExtensions<AzureServiceBusTransport> transportExtensions, Func<string, string> ruleNameSanitizer)
         {
-            Guard.AgainstNull(nameof(ruleNameShortener), ruleNameShortener);
+            Guard.AgainstNull(nameof(ruleNameSanitizer), ruleNameSanitizer);
 
-            Func<string, string> wrappedRuleNameShortener = ruleName =>
+            string WrappedRuleNameSanitizer(string ruleName)
             {
-                try
-                {
-                    return ruleNameShortener(ruleName);
-                }
-                catch (Exception exception)
-                {
-                    throw new Exception("Custom rule name shortener threw an exception.", exception);
-                }
-            };
+	            try
+	            {
+		            return ruleNameSanitizer(ruleName);
+	            }
+	            catch (Exception exception)
+	            {
+		            throw new Exception("Custom rule name sanitizer threw an exception.", exception);
+	            }
+            }
 
-            transportExtensions.GetSettings().Set(SettingsKeys.RuleNameShortener, wrappedRuleNameShortener);
+            transportExtensions.GetSettings().Set(SettingsKeys.RuleNameSanitizer, (Func<string, string>)WrappedRuleNameSanitizer);
 
             return transportExtensions;
         }
